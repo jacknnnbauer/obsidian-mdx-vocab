@@ -200,7 +200,7 @@ export default class VocabPlugin extends Plugin {
 				} else {
 					entries.push({ dictName: d.name, result: r });
 				}
-			} catch (e) {
+			} catch {
 				entries.push({ dictName: d.name, result: null });
 			}
 		}

@@ -1,3 +1,4 @@
+import { sanitizeHTMLToDom } from "obsidian";
 import type { LookupFailure, LookupResult } from "./dictionaryManager";
 
 const MATCH_LABEL: Record<LookupResult["matchType"], string> = {
@@ -115,7 +116,15 @@ export class LookupPopup {
 			const host = this.shadow.querySelector<HTMLElement>(`.mv-dict-entry[data-dict-index="${i}"]`);
 			if (!host) return;
 			const inner = host.attachShadow({ mode: "open" });
-			inner.innerHTML = `<style>${e.result!.css}\n${DICT_SCOPE_OVERRIDE}</style><div class="mv-dict-inner">${e.result!.html}</div>`;
+
+			const styleEl = document.createElement("style");
+			styleEl.textContent = `${e.result!.css}\n${DICT_SCOPE_OVERRIDE}`;
+
+			const contentEl = document.createElement("div");
+			contentEl.className = "mv-dict-inner";
+			contentEl.appendChild(sanitizeHTMLToDom(e.result!.html));
+
+			inner.replaceChildren(styleEl, contentEl);
 		});
 
 		this.shadow.querySelector('[data-act="close"]')?.addEventListener("click", () => this.close());
@@ -176,7 +185,14 @@ export class LookupPopup {
 	}
 
 	private render(bodyHtml: string) {
-		this.shadow.innerHTML = `<style>${BASE_STYLE}</style><div class="mv-panel">${bodyHtml}</div>`;
+		const styleEl = document.createElement("style");
+		styleEl.textContent = BASE_STYLE;
+
+		const panel = document.createElement("div");
+		panel.className = "mv-panel";
+		panel.appendChild(sanitizeHTMLToDom(bodyHtml));
+
+		this.shadow.replaceChildren(styleEl, panel);
 	}
 
 	close() {

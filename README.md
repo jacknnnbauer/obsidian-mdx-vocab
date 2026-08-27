@@ -1,3 +1,13 @@
+# MDX Vocab Lookup
+
+Look up words in your own local MDX dictionaries right inside Obsidian. Double-click, single-click, or drag-select a word while reading a note, and a popup shows the dictionary's definition with its original formatting preserved. Every lookup is automatically saved with the full sentence, book title/author (from frontmatter), and timestamp, so you can export a nicely formatted Word or HTML vocabulary list when you're done reading — or export just today's words for daily review. Works fully offline; no network requests are made.
+
+If you're used to the "tap a word, look it up, export a vocab list when you finish the book" workflow from e-readers like Kindle, this plugin brings that same experience into Obsidian, since your books/articles are already Markdown notes there.
+
+**Key features**: multiple dictionaries at once, three lookup triggers (double-click / single-click / drag-select), faithful rendering of the dictionary's own CSS, automatic word-form fallback (e.g. `observed` → `observe`) with edit-distance suggestions, an in-app vocab table with checkbox selection and inline word correction (re-looks up automatically), Word/HTML export with a native save dialog, and optional per-book note syncing. See below for full Chinese documentation (中文说明见下方).
+
+---
+
 # MDX 点查生词本
 
 在 Obsidian 里读书时，点一下生词就能查本地 MDX 词典的释义，自动记下例句、书名、作者和时间；读完一本书，直接导出一份排版精美的 Word / HTML 生词本，或者按天挑出当天查的词单独导出复习。全程离线运行，不发送任何网络请求。

@@ -4,10 +4,17 @@ import { escapeHtml } from "./exportShared";
 export function buildVocabHtmlList(records: VocabRecord[], fields: ExportFieldConfig[]): string {
 	const enabledKeys = new Set(fields.filter((f) => f.enabled).map((f) => f.key));
 
-	// 不同词典的 CSS 常有同名的通用 class（.word / .table ...），直接拼在一起会互相覆盖。
-	// 每条释义单独用 <template> 包住自己的 <style>+HTML，靠页面底部的小脚本各自套一层
-	// Shadow DOM 再展开，做到跟弹窗查词一样的"每本词典互不干扰"。
-	let dictBlockSeq = 0;
+	// 不同词典的 CSS 常有同名的通用 class（.word / .table ...），全局注入理论上有小概率互相覆盖，
+	// 但导出文件不允许带 <script>（Obsidian 插件审核不允许动态构造 script 标签），
+	// 所以这里不做每条释义单独用 Shadow DOM 隔离，直接把各词典的 CSS 去重后放进 <head>，
+	// 效果等同于 MDict 里多个词典面板共享一个页面时的样子。
+	const cssByDict = new Map<string, string>();
+	for (const r of records) {
+		for (const d of r.definitions) {
+			if (!cssByDict.has(d.dictName)) cssByDict.set(d.dictName, d.css);
+		}
+	}
+	const allDictCss = [...cssByDict.values()].join("\n");
 
 	const items = records
 		.map((r, i) => {
@@ -21,16 +28,14 @@ export function buildVocabHtmlList(records: VocabRecord[], fields: ExportFieldCo
 			const multiDict = r.definitions.length > 1;
 			const defBlocks = enabledKeys.has("definition")
 				? r.definitions
-						.map((d) => {
-							const tplId = `mv-tpl-${dictBlockSeq++}`;
-							return `
+						.map(
+							(d) => `
 								<div class="dict-block">
 									${multiDict ? `<div class="dict-name">${escapeHtml(d.dictName)}</div>` : ""}
-									<div class="dict-html" data-dict-host="${tplId}"></div>
-									<template id="${tplId}"><style>${d.css}</style>${d.html}</template>
+									<div class="dict-html">${d.html}</div>
 								</div>
-							`;
-						})
+							`
+						)
 						.join("")
 				: "";
 
@@ -49,26 +54,18 @@ export function buildVocabHtmlList(records: VocabRecord[], fields: ExportFieldCo
 		<h1>生词本</h1>
 		<p class="meta">共 ${records.length} 个单词 · 导出于 ${new Date().toLocaleString()}</p>
 		${items}
-		<script>
-			document.querySelectorAll("[data-dict-host]").forEach(function (host) {
-				var tpl = document.getElementById(host.getAttribute("data-dict-host"));
-				if (!tpl) return;
-				var root = host.attachShadow({ mode: "open" });
-				root.appendChild(tpl.content.cloneNode(true));
-			});
-		</script>
 	`;
 
-	return wrapHtmlDoc("生词本", body, LIST_STYLE);
+	return wrapHtmlDoc("生词本", body, `${LIST_STYLE}\n${allDictCss}`);
 }
 
-function wrapHtmlDoc(title: string, bodyHtml: string, styleTag: string): string {
+function wrapHtmlDoc(title: string, bodyHtml: string, styleContent: string): string {
 	return `<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
 <title>${escapeHtml(title)}</title>
-${styleTag.startsWith("<style") ? styleTag : `<style>${styleTag}</style>`}
+<style>${styleContent}</style>
 </head>
 <body>
 <div class="mv-container">

@@ -1,0 +1,17 @@
+/* 生词本记录表格的横向滚动条：画得明显一点，避免有些主题把原生滚动条做得很细/很淡看不清。 */
+.mv-records-scroll {
+	scrollbar-width: auto;
+}
+.mv-records-scroll::-webkit-scrollbar {
+	height: 10px;
+}
+.mv-records-scroll::-webkit-scrollbar-track {
+	background: var(--background-secondary);
+}
+.mv-records-scroll::-webkit-scrollbar-thumb {
+	background: var(--background-modifier-border);
+	border-radius: 5px;
+}
+.mv-records-scroll::-webkit-scrollbar-thumb:hover {
+	background: var(--text-faint);
+}

@@ -128,9 +128,9 @@ export class VocabSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-		containerEl.createEl("h2", { text: "MDX 点查生词本" });
+		new Setting(containerEl).setName("MDX 点查生词本").setHeading();
 
-		containerEl.createEl("h3", { text: "词典（可添加多本，查词时会同时在所有已启用的词典里查）" });
+		new Setting(containerEl).setName("词典（可添加多本，查词时会同时在所有已启用的词典里查）").setHeading();
 		const dictList = containerEl.createDiv();
 		this.renderDictList(dictList);
 		containerEl.createEl("p", {
@@ -174,7 +174,7 @@ export class VocabSettingTab extends PluginSettingTab {
 			})
 		);
 
-		containerEl.createEl("h3", { text: "同步到笔记" });
+		new Setting(containerEl).setName("同步到笔记").setHeading();
 		new Setting(containerEl)
 			.setName("查到的词记录到 Note 里")
 			.setDesc("按书名（笔记标题）一本书一个 Note，追加写入单词、例句、书名/作者、时间，方便直接在 vault 里浏览（不含释义——释义通常很长，塞进 md 不好看，要看释义用插件设置页里的记录表格或导出）。")
@@ -204,7 +204,7 @@ export class VocabSettingTab extends PluginSettingTab {
 				})
 			);
 
-		containerEl.createEl("h3", { text: "导出" });
+		new Setting(containerEl).setName("导出").setHeading();
 		new Setting(containerEl)
 			.setName("导出格式")
 			.addDropdown((dd) =>
@@ -238,18 +238,17 @@ export class VocabSettingTab extends PluginSettingTab {
 				slider
 					.setLimits(1, 4, 1)
 					.setValue(this.plugin.settings.fuzzyEditDistance)
-					.setDynamicTooltip()
 					.onChange(async (value) => {
 						this.plugin.settings.fuzzyEditDistance = value;
 						await this.plugin.saveSettings();
 					})
 			);
 
-		containerEl.createEl("h3", { text: "导出字段（勾选是否导出，用上下箭头排序）" });
+		new Setting(containerEl).setName("导出字段（勾选是否导出，用上下箭头排序）").setHeading();
 		const list = containerEl.createDiv();
 		this.renderFieldList(list);
 
-		containerEl.createEl("h3", { text: "生词本" });
+		new Setting(containerEl).setName("生词本").setHeading();
 		this.recordsCountSetting = new Setting(containerEl)
 			.setName(`当前已记录 ${this.plugin.records.length} 个单词`)
 			.setDesc("下面表格里勾选几条就只导出勾选的；一条都没勾就导出全部。")
@@ -262,7 +261,7 @@ export class VocabSettingTab extends PluginSettingTab {
 			.addButton((btn) =>
 				btn
 					.setButtonText("清空生词本")
-					.setWarning()
+					.setDestructive()
 					.onClick(async () => {
 						if (confirm("确定要清空全部生词记录吗？此操作不可撤销。")) {
 							await this.plugin.clearRecords();
@@ -302,13 +301,13 @@ export class VocabSettingTab extends PluginSettingTab {
 			return;
 		}
 
-		container.style.minWidth = "0";
+		Object.assign(container.style, { minWidth: "0" });
 
 		const toolbar = container.createDiv();
 		Object.assign(toolbar.style, { display: "flex", gap: "8px", marginBottom: "6px" });
 		const toolbarBtn = (text: string, onClick: () => void) => {
 			const btn = toolbar.createEl("button", { text });
-			btn.style.fontSize = "12px";
+			Object.assign(btn.style, { fontSize: "12px" });
 			btn.addEventListener("click", onClick);
 			return btn;
 		};
@@ -328,27 +327,15 @@ export class VocabSettingTab extends PluginSettingTab {
 			this.renderRecordsTable(container);
 		});
 		if (this.selectedRecordIds.size > 0) {
-			toolbar.createSpan({
+			const countLabel = toolbar.createSpan({
 				text: `已选 ${this.selectedRecordIds.size} 条`,
 				cls: "setting-item-description",
-			}).style.alignSelf = "center";
+			});
+			Object.assign(countLabel.style, { alignSelf: "center" });
 		}
 
-		// 用一个带自定义 class 的 <style>，把横向滚动条画得明显一点——
-		// 有些主题把原生滚动条做得很细/很淡，条本身其实在只是不容易看到。
-		if (!document.getElementById("mv-records-scrollbar-style")) {
-			const styleEl = document.createElement("style");
-			styleEl.id = "mv-records-scrollbar-style";
-			styleEl.textContent = `
-				.mv-records-scroll { scrollbar-width: auto; }
-				.mv-records-scroll::-webkit-scrollbar { height: 10px; }
-				.mv-records-scroll::-webkit-scrollbar-track { background: var(--background-secondary); }
-				.mv-records-scroll::-webkit-scrollbar-thumb { background: var(--background-modifier-border); border-radius: 5px; }
-				.mv-records-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
-			`;
-			document.head.appendChild(styleEl);
-		}
-
+		// 横向滚动条的样式在 styles.css 里（.mv-records-scroll），Obsidian 会自动加载该文件，
+		// 不需要在这里动态创建 <style> 元素。
 		const wrap = container.createDiv({ cls: "mv-records-scroll" });
 		Object.assign(wrap.style, {
 			display: "block",
@@ -430,8 +417,7 @@ export class VocabSettingTab extends PluginSettingTab {
 			const row = tbody.createEl("tr");
 
 			const checkTd = row.createEl("td");
-			checkTd.style.padding = "6px 8px";
-			checkTd.style.borderBottom = "1px solid var(--background-modifier-border)";
+			Object.assign(checkTd.style, { padding: "6px 8px", borderBottom: "1px solid var(--background-modifier-border)" });
 			const checkbox = checkTd.createEl("input", { type: "checkbox" });
 			checkbox.checked = this.selectedRecordIds.has(r.id);
 			checkbox.addEventListener("change", () => {
@@ -591,7 +577,7 @@ class TextPromptModal extends Modal {
 		const { contentEl } = this;
 		contentEl.createEl("h3", { text: this.title });
 		const input = contentEl.createEl("input", { type: "text" });
-		input.style.width = "100%";
+		Object.assign(input.style, { width: "100%" });
 		input.value = this.initialValue;
 
 		const submit = () => {

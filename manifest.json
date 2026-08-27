@@ -1,9 +1,9 @@
 {
   "id": "mdx-vocab-lookup",
   "name": "MDX Vocab Lookup",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minAppVersion": "1.4.0",
-  "description": "点击生词即查 MDX 词典释义，自动记录例句/书名/作者，读完一键导出 Word 生词本。",
+  "description": "Look up words in local MDX dictionaries with a click, auto-record sentences and book info, and export a Word/HTML vocabulary list.",
   "author": "jacknnnbauer",
   "authorUrl": "",
   "isDesktopOnly": true
