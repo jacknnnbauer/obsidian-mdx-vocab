@@ -28,6 +28,9 @@ export class LookupPopup {
 		this.el.addClass("mdx-vocab-popup-host");
 		document.body.appendChild(this.el);
 		this.shadow = this.el.attachShadow({ mode: "open" });
+		const baseSheet = new CSSStyleSheet();
+		baseSheet.replaceSync(BASE_STYLE);
+		this.shadow.adoptedStyleSheets = [baseSheet];
 		this.position(anchorRect);
 
 		const onDocDown = (evt: MouseEvent) => {
@@ -117,14 +120,15 @@ export class LookupPopup {
 			if (!host) return;
 			const inner = host.attachShadow({ mode: "open" });
 
-			const styleEl = document.createElement("style");
-			styleEl.textContent = `${e.result!.css}\n${DICT_SCOPE_OVERRIDE}`;
+			const sheet = new CSSStyleSheet();
+			sheet.replaceSync(`${e.result!.css}\n${DICT_SCOPE_OVERRIDE}`);
+			inner.adoptedStyleSheets = [sheet];
 
 			const contentEl = document.createElement("div");
 			contentEl.className = "mv-dict-inner";
 			contentEl.appendChild(sanitizeHTMLToDom(e.result!.html));
 
-			inner.replaceChildren(styleEl, contentEl);
+			inner.replaceChildren(contentEl);
 		});
 
 		this.shadow.querySelector('[data-act="close"]')?.addEventListener("click", () => this.close());
@@ -185,14 +189,11 @@ export class LookupPopup {
 	}
 
 	private render(bodyHtml: string) {
-		const styleEl = document.createElement("style");
-		styleEl.textContent = BASE_STYLE;
-
 		const panel = document.createElement("div");
 		panel.className = "mv-panel";
 		panel.appendChild(sanitizeHTMLToDom(bodyHtml));
 
-		this.shadow.replaceChildren(styleEl, panel);
+		this.shadow.replaceChildren(panel);
 	}
 
 	close() {

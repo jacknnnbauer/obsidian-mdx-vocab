@@ -83,6 +83,11 @@ Turn on "Sync lookups to a note" in settings, and pick a folder (the "Browse…"
 
 ## Changelog
 
+### 0.1.2
+
+- Replaced dynamically-created `<style>` elements in the lookup popup with `CSSStyleSheet`/`adoptedStyleSheets` (still needed to render each dictionary's own CSS, but without creating style elements).
+- Reverted a button call that used a newer Obsidian API than the declared `minAppVersion`.
+
 ### 0.1.1
 
 - Fixed several issues flagged by the community plugin review (unsafe DOM APIs, dynamically-created style/script elements, deprecated APIs) without changing behavior.

@@ -261,7 +261,7 @@ export class VocabSettingTab extends PluginSettingTab {
 			.addButton((btn) =>
 				btn
 					.setButtonText("清空生词本")
-					.setDestructive()
+					.setWarning()
 					.onClick(async () => {
 						if (confirm("确定要清空全部生词记录吗？此操作不可撤销。")) {
 							await this.plugin.clearRecords();
