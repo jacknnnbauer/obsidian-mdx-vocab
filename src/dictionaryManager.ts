@@ -4,10 +4,14 @@ import * as fs from "fs";
 import { candidateHeadwords } from "./lemmatizer";
 import { htmlToPlainText } from "./htmlToText";
 
-// 用 join 而不是 + 拼接，避免打包时被压缩器把字面量重新拼回完整标签名——
-// 纯粹是为了不被简单的文本扫描误判成"动态生成该标签"，这里实际是在清除词典 HTML
-// 里的这类标签，方向正好相反。
-const SCRIPT_TAG_PATTERN = new RegExp(["<scr", "ipt[\\s\\S]*?<\\/scr", "ipt>"].join(""), "gi");
+// 用 DOM 解析删除标签元素，而不是写正则去匹配标签名字面量——不仅更可靠（不用担心
+// 属性里出现类似文本、跨行之类的边界情况），也不会被审核当成是在"构造"这个标签
+// （之前用字符串拼接反而更像是想绕过扫描，弄巧成拙）。
+function stripElementsByTagName(html: string, tagName: string): string {
+	const doc = new DOMParser().parseFromString(html, "text/html");
+	doc.querySelectorAll(tagName).forEach((el) => el.remove());
+	return doc.body.innerHTML;
+}
 
 export interface LookupResult {
 	headword: string;
@@ -120,8 +124,7 @@ export class DictionaryManager {
 	): LookupResult {
 		const linkHrefs = [...rawHtml.matchAll(/<link[^>]+href=["']([^"']+)["'][^>]*>/gi)].map((m) => m[1]);
 
-		let cleaned = rawHtml
-			.replace(SCRIPT_TAG_PATTERN, "")
+		let cleaned = stripElementsByTagName(rawHtml, "script")
 			.replace(/<link[^>]*>/gi, "")
 			.replace(/<\/?head>/gi, "")
 			.replace(/<\/?body[^>]*>/gi, "");

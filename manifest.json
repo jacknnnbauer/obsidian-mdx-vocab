@@ -1,7 +1,7 @@
 {
   "id": "mdx-vocab-lookup",
   "name": "MDX Vocab Lookup",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "minAppVersion": "1.4.0",
   "description": "Look up words in local MDX dictionaries with a click, auto-record sentences and book info, and export a Word/HTML vocabulary list.",
   "author": "jacknnnbauer",
