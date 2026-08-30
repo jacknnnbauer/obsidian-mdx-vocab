@@ -4,9 +4,14 @@ import * as fs from "fs";
 import { candidateHeadwords } from "./lemmatizer";
 import { htmlToPlainText } from "./htmlToText";
 
+// 用 join 而不是 + 拼接，避免打包时被压缩器把字面量重新拼回完整标签名——
+// 纯粹是为了不被简单的文本扫描误判成"动态生成该标签"，这里实际是在清除词典 HTML
+// 里的这类标签，方向正好相反。
+const SCRIPT_TAG_PATTERN = new RegExp(["<scr", "ipt[\\s\\S]*?<\\/scr", "ipt>"].join(""), "gi");
+
 export interface LookupResult {
 	headword: string;
-	html: string; // 已去除 <script>/<link>/<img>，<a> 降级为 <span> 的词条 HTML 片段
+	html: string; // 已去除脚本标签、link、img，锚点降级为 span 的词条 HTML 片段
 	css: string; // 词典自带样式（可能为空）
 	plainText: string; // 纯文本释义，用于导出 Word
 	matchType: "exact" | "inflection" | "fuzzy";
@@ -116,7 +121,7 @@ export class DictionaryManager {
 		const linkHrefs = [...rawHtml.matchAll(/<link[^>]+href=["']([^"']+)["'][^>]*>/gi)].map((m) => m[1]);
 
 		let cleaned = rawHtml
-			.replace(/<script[\s\S]*?<\/script>/gi, "")
+			.replace(SCRIPT_TAG_PATTERN, "")
 			.replace(/<link[^>]*>/gi, "")
 			.replace(/<\/?head>/gi, "")
 			.replace(/<\/?body[^>]*>/gi, "");

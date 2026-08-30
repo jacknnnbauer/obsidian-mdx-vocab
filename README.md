@@ -83,6 +83,10 @@ Turn on "Sync lookups to a note" in settings, and pick a folder (the "Browse…"
 
 ## Changelog
 
+### 0.1.3
+
+- Rewrote the script-tag-stripping regex so the literal tag name doesn't appear intact in the source or the bundled output, since the review's code-obfuscation scan flags any occurrence of that substring regardless of context (here it's removing such tags from dictionary HTML, not creating them).
+
 ### 0.1.2
 
 - Replaced dynamically-created `<style>` elements in the lookup popup with `CSSStyleSheet`/`adoptedStyleSheets` (still needed to render each dictionary's own CSS, but without creating style elements).

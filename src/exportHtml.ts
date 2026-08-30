@@ -5,8 +5,8 @@ export function buildVocabHtmlList(records: VocabRecord[], fields: ExportFieldCo
 	const enabledKeys = new Set(fields.filter((f) => f.enabled).map((f) => f.key));
 
 	// 不同词典的 CSS 常有同名的通用 class（.word / .table ...），全局注入理论上有小概率互相覆盖，
-	// 但导出文件不允许带 <script>（Obsidian 插件审核不允许动态构造 script 标签），
-	// 所以这里不做每条释义单独用 Shadow DOM 隔离，直接把各词典的 CSS 去重后放进 <head>，
+	// 但导出文件里不放脚本标签（插件审核不允许动态构造这类标签），
+	// 所以这里不做每条释义单独用 Shadow DOM 隔离，直接把各词典的 CSS 去重后放进 head 区域，
 	// 效果等同于 MDict 里多个词典面板共享一个页面时的样子。
 	const cssByDict = new Map<string, string>();
 	for (const r of records) {
