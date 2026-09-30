@@ -83,6 +83,10 @@ Turn on "Sync lookups to a note" in settings, and pick a folder (the "Browse…"
 
 ## Changelog
 
+### 0.1.5
+
+- Found the actual source of the "dynamic script element creations" finding: it wasn't anything in this plugin's own code, but a dead-code fallback branch (an old IE-era `createElement("script")` trick for scheduling) bundled inside the `docx` dependency's compiled output. It's unreachable in Electron (a `MutationObserver`/`MessageChannel` check always wins first), so the fix is a build-time patch (via `patch-package`) that removes it from `docx`'s bundled files, applied automatically on install.
+
 ### 0.1.4
 
 - The 0.1.3 fix (splitting the string via concatenation) likely looked like an evasion attempt to the review's obfuscation check and still got flagged. Replaced it with straightforward DOM parsing: remove `<script>` elements via `querySelectorAll("script")` instead of any string pattern matching a tag name.

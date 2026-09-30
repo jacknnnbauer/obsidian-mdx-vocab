@@ -4,6 +4,7 @@
   "description": "点击查词（MDX 词典）+ 自动记录语境（书名/作者/例句），一键导出 Word 生词本",
   "main": "main.js",
   "scripts": {
+    "postinstall": "patch-package",
     "dev": "node esbuild.config.mjs",
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production"
   },
@@ -15,10 +16,11 @@
     "builtin-modules": "^3.3.0",
     "esbuild": "^0.21.0",
     "obsidian": "^1.5.0",
+    "patch-package": "^8.0.1",
     "typescript": "^5.4.0"
   },
   "dependencies": {
-    "docx": "^9.0.0",
+    "docx": "9.7.1",
     "js-mdict": "6.0.8"
   }
 }
