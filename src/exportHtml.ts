@@ -1,7 +1,5 @@
-import { ExportFieldConfig, VocabRecord } from "./types";
+import { ExportFieldConfig, HtmlExportTheme, VocabRecord } from "./types";
 import { escapeHtml } from "./exportShared";
-
-export type HtmlExportTheme = "warm" | "steel" | "navy-gold";
 
 export function buildVocabHtmlList(
 	records: VocabRecord[],
@@ -144,8 +142,23 @@ const NAVY_GOLD_STYLE = `${baseStyle("#f3f1e9", '"Segoe UI", "PingFang SC", "Mic
 	.dict-html { font-size: 14px; }
 `;
 
+// 简约咨询风：参照 md2pdf「咨询报告」配色——墨绿底色标题、青色点缀，纯白底卡片，大留白、干净克制。
+const CONSULT_STYLE = `${baseStyle("#f3f7f8", '"Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif')}
+	h1 { color: #0b5563; }
+	.entry { padding: 20px 0; border-bottom: 1px solid #d9e7e9; page-break-inside: avoid; }
+	.entry:last-child { border-bottom: none; }
+	.entry h3 { font-size: 19px; margin: 0 0 8px; color: #0b5563; border-bottom: 1.4px solid #0b8a8f; padding-bottom: 6px; display: inline-block; }
+	.entry .sentence { margin: 0 0 6px; padding-left: 12px; border-left: 3px solid #0b8a8f; color: #445a5c; font-style: italic; }
+	.entry .meta { margin: 0 0 12px; color: #6f8a8d; }
+	.definitions { display: flex; flex-direction: column; gap: 10px; }
+	.dict-block { background: #eef6f7; border: 1px solid #c8dde0; border-radius: 6px; padding: 10px 14px; }
+	.dict-name { font-size: 12px; font-weight: 700; color: #0b8a8f; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .3px; }
+	.dict-html { font-size: 14px; }
+`;
+
 const THEME_STYLES: Record<HtmlExportTheme, string> = {
 	warm: WARM_STYLE,
 	steel: STEEL_STYLE,
 	"navy-gold": NAVY_GOLD_STYLE,
+	consult: CONSULT_STYLE,
 };

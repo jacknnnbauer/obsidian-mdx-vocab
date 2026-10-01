@@ -43,7 +43,7 @@ export interface ExportFieldConfig {
 
 export type LookupTrigger = "dblclick" | "click" | "drag";
 export type ExportFormat = "html-list" | "pdf";
-export type HtmlExportTheme = "warm" | "steel" | "navy-gold";
+export type HtmlExportTheme = "warm" | "steel" | "navy-gold" | "consult";
 
 export interface NoteSyncSettings {
 	enabled: boolean;

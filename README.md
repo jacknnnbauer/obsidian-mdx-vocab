@@ -27,11 +27,15 @@
 
 ## 导出效果预览
 
-导出的 HTML 是逐词排版，释义保留词典原生格式（颜色、加粗、音标一个不少）。下面是同一个词条（`oppose`）在三种配色下的样子，设置里「HTML 导出配色」可以切换：
+导出的 HTML 是逐词排版，释义保留词典原生格式（颜色、加粗、音标一个不少）。下面是同一个词条（`oppose`）在四种配色下的样子，设置里「导出配色」可以切换：
 
-| 暖色经典（默认） | 钢蓝技术风 | 国际双语风 |
-| --- | --- | --- |
-| ![暖色经典](screenshots/theme-warm.jpg) | ![钢蓝技术风](screenshots/theme-steel.jpg) | ![国际双语风](screenshots/theme-navy-gold.jpg) |
+| 暖色经典（默认） | 钢蓝技术风 |
+| --- | --- |
+| ![暖色经典](screenshots/theme-warm.jpg) | ![钢蓝技术风](screenshots/theme-steel.jpg) |
+
+| 国际双语风 | 简约咨询风 |
+| --- | --- |
+| ![国际双语风](screenshots/theme-navy-gold.jpg) | ![简约咨询风](screenshots/theme-consult.jpg) |
 
 ---
 
@@ -97,6 +101,8 @@
 ### 0.1.8
 
 - 导出格式改为 HTML / PDF 两种，PDF 由 Obsidian 内置的 Electron（`printToPDF`）直接生成，不用再手动"打印另存"；彻底移除了 Word 导出和 `docx` 依赖，`main.js` 体积从约 434KB 降到约 76KB。
+- 新增第四套导出配色"简约咨询风"（纯白底，墨绿青色点缀），现在一共四套配色，HTML 和 PDF 导出都能选。
+- README 导出效果预览截图全部重新高清截图，改成两张一排、两排四张的排版。
 - 生词本表格的「导出」「清空生词本」按钮移到和「全选」「选中今天」「清空选择」同一行工具栏，靠右对齐。
 - 修复表格往上滚动时，左侧勾选框从表头下方透出来的重叠问题（表格改用 `border-collapse: separate`）。
 - 去掉了"修复旧记录的释义排版"这个设置项（已没有用处）。

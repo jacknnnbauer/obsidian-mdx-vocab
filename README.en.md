@@ -25,11 +25,15 @@ If you're used to the "tap a word, look it up, export a vocab list when you fini
 
 ## What the export looks like
 
-The HTML export lays out one word per section, with definitions kept in the dictionary's original formatting (colors, bold text, phonetics — all preserved). Here's the same entry (`oppose`) in the three built-in color themes, switchable from "HTML export theme" in settings:
+The HTML export lays out one word per section, with definitions kept in the dictionary's original formatting (colors, bold text, phonetics — all preserved). Here's the same entry (`oppose`) in the four built-in color themes, switchable from "Export theme" in settings:
 
-| Warm classic (default) | Steel blue | Navy & gold |
-| --- | --- | --- |
-| ![Warm classic](screenshots/theme-warm.jpg) | ![Steel blue](screenshots/theme-steel.jpg) | ![Navy & gold](screenshots/theme-navy-gold.jpg) |
+| Warm classic (default) | Steel blue |
+| --- | --- |
+| ![Warm classic](screenshots/theme-warm.jpg) | ![Steel blue](screenshots/theme-steel.jpg) |
+
+| Navy & gold | Minimal consult |
+| --- | --- |
+| ![Navy & gold](screenshots/theme-navy-gold.jpg) | ![Minimal consult](screenshots/theme-consult.jpg) |
 
 ---
 
@@ -95,6 +99,8 @@ Turn on "Sync lookups to a note" in settings, and pick a folder (the "Browse…"
 ### 0.1.8
 
 - Export format is now HTML / PDF only: PDFs are generated natively via Obsidian's built-in Electron (`printToPDF`), no more manual "print to PDF" step. Removed Word export and the `docx` dependency entirely, shrinking `main.js` from ~434KB to ~76KB.
+- Added a fourth export theme, "Minimal consult" (white background, teal/dark-green accents) — four themes total now, selectable for both HTML and PDF export.
+- Re-captured all the README export preview screenshots in higher resolution, laid out as a 2x2 grid instead of a single row of three.
 - Moved the "Export" and "Clear vocab list" buttons into the same toolbar row as "Select all" / "Select today" / "Clear selection", right-aligned.
 - Fixed a visual bug where the row checkboxes bled through the sticky table header when scrolling up (table now uses `border-collapse: separate`).
 - Removed the now-unused "repair old records' definition formatting" setting.

@@ -1,6 +1,6 @@
 import { App, FuzzySuggestModal, Modal, Notice, PluginSettingTab, Setting, TFolder } from "obsidian";
 import type VocabPlugin from "./main";
-import { DictionaryEntry } from "./types";
+import { DictionaryEntry, HtmlExportTheme } from "./types";
 import { getElectronRemote } from "./electronRemote";
 
 export class VocabSettingTab extends PluginSettingTab {
@@ -218,16 +218,17 @@ export class VocabSettingTab extends PluginSettingTab {
 					})
 			);
 		new Setting(containerEl)
-			.setName("HTML 导出配色")
+			.setName("导出配色")
 			.setDesc("影响 HTML 和 PDF 导出的配色和字体（PDF 由同一份 HTML 生成）。")
 			.addDropdown((dd) =>
 				dd
 					.addOption("warm", "暖色经典（米白底，暖棕色点缀）")
 					.addOption("steel", "钢蓝技术风（浅蓝灰底，钢蓝色点缀）")
 					.addOption("navy-gold", "国际双语风（藏青标题，金色分割线）")
+					.addOption("consult", "简约咨询风（纯白底，墨绿青色点缀）")
 					.setValue(this.plugin.settings.htmlExportTheme)
 					.onChange(async (value) => {
-						this.plugin.settings.htmlExportTheme = value as "warm" | "steel" | "navy-gold";
+						this.plugin.settings.htmlExportTheme = value as HtmlExportTheme;
 						await this.plugin.saveSettings();
 					})
 			);
