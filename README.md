@@ -1,140 +1,142 @@
-**[English](README.md) | [中文](README.zh-CN.md)**
+**[English](README.en.md) | 中文**
 
-# MDX Vocab Lookup
+*Reading this in English? See [README.en.md](README.en.md) for the full English documentation.*
 
-Look up words in your own local MDX dictionaries right inside Obsidian. Double-click, single-click, or drag-select a word while reading a note, and a popup shows the dictionary's definition with its original formatting preserved. Every lookup is automatically saved with the full sentence, book title/author (from frontmatter), and timestamp, so you can export a nicely formatted Word or HTML vocabulary list when you're done reading — or export just today's words for daily review. Works fully offline; no network requests are made.
+# MDX 点查生词本
 
-If you're used to the "tap a word, look it up, export a vocab list when you finish the book" workflow from e-readers like Kindle, this plugin brings that same experience into Obsidian, since your books/articles are already Markdown notes there.
+在 Obsidian 里读书时，点一下生词就能查本地 MDX 词典的释义，自动记下例句、书名、作者和时间；读完一本书，直接导出一份排版精美的 Word / HTML 生词本，或者按天挑出当天查的词单独导出复习。全程离线运行，不发送任何网络请求。
 
----
-
-## Key features
-
-- **Three lookup triggers**: double-click (default, doesn't interfere with placing your cursor), single-click (closest to the Kindle experience), or drag-select a range of text — switch anytime in settings.
-- **Multiple dictionaries at once**: add several `.mdx` dictionaries; a lookup shows definitions from every enabled dictionary, and you can reorder how they're displayed.
-- **Faithful rendering of the dictionary's own layout**: automatically loads the CSS a dictionary entry references — whether it's packed into a same-named `.mdd` file or sitting next to the `.mdx` as a plain file — so the popup looks the same as it would in MDict, right down to bold text, colors, phonetics, and part-of-speech tags. Text is selectable and copyable, and won't navigate away unexpectedly.
-- **Smart word-form fallback**: if the exact word isn't found, it automatically tries the base form (e.g. `observed → observe`, `explosives → explosive`); if that still fails, it offers the closest matches by edit distance, or you can type in the correct headword yourself.
-- **Automatic context recording**: the **full sentence** the word appears in (correctly extracted whether your note uses hard line breaks or one long paragraph per line), the book title and author (read from frontmatter, with configurable field names), and the timestamp — all captured in a single click.
-- **Fix a lookup after the fact**: looked up the wrong word form (e.g. got `opposed` when you meant to learn `oppose`)? Double-click the word in the vocab table to edit it in place; it automatically re-looks up the new word and replaces the definition.
-- **Pick what to export**: the built-in vocab table supports checkboxes with "Select all", "Select today", and "Clear selection" — export just the checked rows, or export everything if nothing is checked. Handy for a "export just the 20 words I looked up today" review habit.
-- **Export to Word or HTML**: both formats lay out one word per section (heading + sentence + book/author/date + full definition), preserving the dictionary's original formatting. Want a PDF? Export HTML, then use your browser's Print → Save as PDF — same result.
-- **Optional note syncing**: turn this on to append each lookup (word, sentence, timestamp — no definitions, since those are long and don't read well in Markdown) to a per-book note, so you can browse everything you looked up for a given book directly in your vault.
-- **Fully offline**: no network access, no uploading of your notes or dictionary data.
+如果你习惯在 Kindle 上"点词即查、读完导出生词本"这套流程，这个插件把同样的体验搬进了 Obsidian：你的书或文章本来就是 Markdown 笔记，查词、记录语境、复习导出都不用离开 Obsidian。
 
 ---
 
-## Installation
+## 主要特性
 
-### From Obsidian's community plugin browser (once approved)
-
-1. Open Settings → Community plugins → Browse, and search for "MDX Vocab Lookup".
-2. Install, then enable it.
-
-### Early access with BRAT, or manual install
-
-1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) and add this repository to track the latest releases automatically.
-2. Or install manually: download `main.js`, `manifest.json`, and `styles.css` from the latest [Release](../../releases), place them in your vault's `.obsidian/plugins/mdx-vocab-lookup/` folder, restart Obsidian, and enable the plugin under Community plugins.
-
-> This plugin is **desktop-only** (it needs to read local `.mdx` files) and won't work on mobile.
-
----
-
-## Usage
-
-### 1. Add a dictionary
-
-1. Open the plugin settings and click "+ Add dictionary…" in the Dictionaries section.
-2. Pick one or more `.mdx` files in the native file picker (multi-select supported).
-3. Dictionaries are named after their filename by default; rename with the pencil icon, and reorder multiple dictionaries with the up/down arrows.
-
-If a dictionary's styling/audio assets are packed into a same-named `.mdd` file, or just sit next to the `.mdx` as plain `.css`/`.js` files, the plugin finds and loads the CSS automatically to restore the dictionary's native look.
-
-### 2. Look up a word
-
-1. Pick a trigger mode in settings: double-click / single-click / drag-select.
-2. Read normally, and trigger a lookup the way you configured — the popup shows definitions from every enabled dictionary.
-3. A successful lookup is automatically saved to your vocab list. If nothing is found, the popup offers the closest matches by edit distance, or you can type in the correct dictionary headword yourself.
-4. Looked up the wrong thing? There's an "Undo" link at the bottom of the popup that removes the most recent entry.
-
-### 3. Manage and export your vocab list
-
-1. At the bottom of the plugin settings, the "Vocab list" section shows a table: number, word, sentence, book, time.
-2. **Fix a word form**: double-click the "word" cell to edit it in place; press Enter or click away to re-look it up and replace the definition automatically.
-3. **Select what to export**: checkboxes on the left, plus "Select all" / "Select today" / "Clear selection" above the table — checked rows are what gets exported; if nothing is checked, everything is exported.
-4. Choose "Word" or "HTML" as the export format, then click "Export" — a native save dialog opens, defaulting to the folder set in settings (you can save anywhere else too).
-5. Want a PDF? Export HTML, open it in your browser, and use Print → Save as PDF.
-
-### 4. Sync to a note (optional)
-
-Turn on "Sync lookups to a note" in settings, and pick a folder (the "Browse…" button lets you choose one from inside your vault). From then on, each lookup is appended to a note named after the book (definitions aren't included, to keep the note readable), so you can see every word you looked up for a given book right in your vault.
+- **三种触发方式**：双击查词（默认，不影响正常编辑点光标）、单击查词（最接近 Kindle 的体验）、划词查词（拖动选中一段文字自动查询），设置里随时切换。
+- **多词典同时查**：可以添加多本 `.mdx` 词典，查一个词会同时显示所有已启用词典的释义，还能调整词典的显示顺序。
+- **忠实还原词典排版**：自动加载词条引用的 CSS（不管是打包在同名 `.mdd` 文件里，还是就以普通文件形式和 `.mdx` 放在一起），弹窗里看到的排版和 MDict 里一致——加粗、颜色、音标、词性一个不少。释义可以正常选中、复制，不会意外跳转到别的地方。
+- **智能词形还原**：查不到时自动尝试还原原形，例如 `observed → observe`、`explosives → explosive`；实在查不到会给出编辑距离最近的候选词条，也可以手动输入词典里的正确词条。
+- **自动记录语境**：单词所在的**完整句子**（不管笔记是硬换行还是整段一行都能正确提取）、书名与作者（读 frontmatter，也可以自定义字段名）、查词时间，一次点击全部自动记好。
+- **记录可以二次修正**：查到的词形不对（比如查到了 `opposed`，其实想学的是 `oppose`）？双击生词本表格里的单词原地编辑，改完自动用新词重新查一遍、替换释义。
+- **导出前可以挑着选**：内置的生词本表格支持勾选——"全选""选中今天""清空选择"，只导出勾中的几条；一条都不选就导出全部，正好对应"每天查了 20 个词只导出当天这批"的复习习惯。
+- **导出 Word / HTML**：两种格式都是逐词排版（标题 + 例句 + 书名作者时间 + 完整释义），释义保留词典原生格式。想要 PDF，导出 HTML 后用浏览器"打印 → 另存为 PDF"即可，效果一样。
+- **可选同步到 Note**：开启后按书名一本书一个 Note，自动追加单词、例句、时间（不含释义，避免又长又乱的排版塞进 Markdown），方便在 vault 里直接翻看某本书查过哪些词。
+- **完全离线**：不联网，不上传笔记内容，也不上传词典数据。
 
 ---
 
-## Compatibility
+## 安装方法
 
-| | |
+### 从 Obsidian 社区插件安装
+
+1. 打开 设置 → 第三方插件 → 浏览，搜索「MDX Vocab Lookup」。
+2. 点击安装，然后启用。
+
+### 用 BRAT 提前体验 / 手动安装
+
+1. 安装 [BRAT](https://github.com/TfTHacker/obsidian42-brat) 插件，添加本仓库地址即可跟随最新 Release 更新。
+2. 或者手动安装：从 [Releases](../../releases) 下载最新版本的 `main.js`、`manifest.json`、`styles.css`，放进 vault 的 `.obsidian/plugins/mdx-vocab-lookup/` 文件夹，重启 Obsidian 并在「第三方插件」里启用。
+
+> 本插件是**仅支持桌面端**的插件（需要读写本地 `.mdx` 文件），不能在手机/平板上使用。
+
+---
+
+## 使用说明
+
+### 一、添加词典
+
+1. 打开插件设置，「词典」区域点击「+ 添加词典…」。
+2. 在弹出的系统文件选择框里选中一本或多本 `.mdx` 文件（支持多选）。
+3. 词典默认按文件名命名，可以点铅笔图标重命名，用上下箭头调整多本词典的查询/显示顺序。
+
+如果词典的样式、发音资源打包在同名的 `.mdd` 文件里，或者就以普通 `.css`/`.js` 文件形式和 `.mdx` 放在同一目录，插件都会自动找到并加载对应的 CSS，还原词典原生排版。
+
+### 二、查词
+
+1. 在设置里选好触发方式：双击 / 单击 / 划词。
+2. 正常阅读笔记，按选好的方式触发查词，弹窗会显示所有已启用词典的释义。
+3. 查到的词会自动记进生词本；如果没查到，弹窗会给出编辑距离最近的候选词条，也可以手动输入词典里的词条查询。
+4. 查错了想撤销？弹窗底部有「撤销」链接，撤掉的是最近这一条记录。
+
+### 三、管理与导出生词本
+
+1. 插件设置最下面「生词本」区域是一个记录表格：序号、单词、例句、书名、时间。
+2. **修正词形**：双击"单词"格子进入编辑状态，改完按回车或点别处，会自动用新词重新查一遍并替换释义。
+3. **勾选导出**：表格最左边是勾选框，配合上方的「全选」「选中今天」「清空选择」——勾中的记录点击「导出」时只会导出这几条；不勾则导出全部。
+4. 「导出格式」可以选 Word 或 HTML，点「导出」会弹出保存对话框，默认定位到设置里配置的文件夹，也可以现场改存到别处。
+5. 想要 PDF：导出 HTML 后用浏览器打开，「打印」→「另存为 PDF」即可。
+
+### 四、同步到 Note（可选）
+
+在设置里开启「查到的词记录到 Note 里」，选好存放文件夹（点「浏览…」可以直接从 vault 内选择），之后每次查到的词会按书名追加写入对应的 Note，方便在 vault 里直接浏览某本书查过的所有生词。
+
+---
+
+## 兼容性说明
+
+| 项目 | 说明 |
 | --- | --- |
-| Obsidian version | 1.4.0 or later recommended |
-| Platform | Desktop only (Windows / macOS / Linux); no mobile support |
-| Network | None required — fully offline |
-| Dictionary format | Unencrypted `.mdx` (MDict format), with optional `.mdd` |
+| Obsidian 版本 | 建议 1.4.0 及以上 |
+| 平台 | 仅桌面端（Windows / macOS / Linux），不支持移动端 |
+| 网络 | 不需要，全程离线 |
+| 词典格式 | 未加密的 `.mdx`（MDict 格式），配套 `.mdd` 可选 |
 
 ---
 
-## Changelog
+## 更新日志
 
 ### 0.1.5
 
-- Found the actual source of the "dynamic script element creations" finding: it wasn't anything in this plugin's own code, but a dead-code fallback branch (an old IE-era `createElement("script")` trick for scheduling) bundled inside the `docx` dependency's compiled output. It's unreachable in Electron (a `MutationObserver`/`MessageChannel` check always wins first), so the fix is a build-time patch (via `patch-package`) that removes it from `docx`'s bundled files, applied automatically on install.
+- 终于找到"动态创建 script 元素"这条报错的真正来源：根本不是这个插件自己的代码，而是依赖库 `docx` 编译产物里自带的一段死代码（一个很老的 IE 时代兼容技巧，用 `createElement("script")` 来调度任务）。这段代码在 Electron 里永远走不到（`MutationObserver`/`MessageChannel` 检测总是优先命中），所以用 `patch-package` 在安装依赖时自动打补丁，把它从 `docx` 的打包文件里去掉。
 
 ### 0.1.4
 
-- The 0.1.3 fix (splitting the string via concatenation) likely looked like an evasion attempt to the review's obfuscation check and still got flagged. Replaced it with straightforward DOM parsing: remove `<script>` elements via `querySelectorAll("script")` instead of any string pattern matching a tag name.
+- 0.1.3 那次用字符串拼接规避扫描的做法，大概率反而更像是在故意躲避检测，所以还是被标记了。这次换成老老实实用 DOM 解析——用 `querySelectorAll("script")` 按元素删除，不用任何匹配标签名的字符串规则。
 
 ### 0.1.3
 
-- Rewrote the script-tag-stripping regex so the literal tag name doesn't appear intact in the source or the bundled output, since the review's code-obfuscation scan flags any occurrence of that substring regardless of context (here it's removing such tags from dictionary HTML, not creating them).
+- 改写了清除词典 HTML 里脚本标签的那条正则表达式的写法，避免完整的标签名字面量出现在源码或打包产物里——审核的"代码混淆"扫描不看上下文，只要出现这个子串就会报，而这里实际是在清除这类标签，不是在生成。
 
 ### 0.1.2
 
-- Replaced dynamically-created `<style>` elements in the lookup popup with `CSSStyleSheet`/`adoptedStyleSheets` (still needed to render each dictionary's own CSS, but without creating style elements).
-- Reverted a button call that used a newer Obsidian API than the declared `minAppVersion`.
+- 弹窗查词里动态创建 `<style>` 元素的地方，改用 `CSSStyleSheet`/`adoptedStyleSheets`（还是要动态应用每本词典自己的 CSS，但不再创建 style 元素）。
+- 回退了一处用了比声明的 `minAppVersion` 更新的按钮 API。
 
 ### 0.1.1
 
-- Fixed several issues flagged by the community plugin review (unsafe DOM APIs, dynamically-created style/script elements, deprecated APIs) without changing behavior.
+- 修复了社区插件审核指出的若干问题（不安全的 DOM API、动态创建的样式/脚本元素、过时的 API 用法），不影响使用行为。
 
 ### 0.1.0
 
-- Initial release.
-- Three lookup triggers: double-click / single-click / drag-select.
-- Multiple dictionaries at once, with reordering and per-dictionary enable/disable.
-- Automatic loading and faithful rendering of a dictionary's native CSS.
-- Word-form fallback plus edit-distance suggestions as a last resort.
-- Automatic recording of the full sentence (smart extraction), book/author, and timestamp.
-- Vocab table supports checkbox export selection and in-place editing with re-lookup.
-- Export to Word / HTML (one word per section, full definitions), with a destination picker.
-- Optional syncing of lookups to a note.
+- 首次发布。
+- 三种查词触发方式：双击 / 单击 / 划词。
+- 多词典同时查询，支持排序与逐本启用/停用。
+- 自动加载并还原词典原生 CSS 排版。
+- 词形还原 + 编辑距离候选兜底。
+- 自动记录例句（智能提取完整句子）、书名/作者、查词时间。
+- 生词本记录支持勾选导出、双击原地编辑并重新查词。
+- 导出 Word / HTML（逐词排版，完整释义），支持导出目的地选择。
+- 可选同步查词记录到 Note。
 
 ---
 
-## License and credits
+## 许可证与致谢
 
-This plugin is released under the **MIT** license.
+本插件以 **MIT** 协议发布。
 
-MDX dictionary parsing is based on [js-mdict](https://github.com/terasum/js-mdict), pinned at v6.0.8 — the last MIT-licensed release before the project switched to AGPL-3.0 in v7. Thanks to its author.
+MDX 词典解析基于 [js-mdict](https://github.com/terasum/js-mdict)（锁定在 v6.0.8——该项目 v7 起改为 AGPL-3.0，v6.0.8 是转许可前最后一个 MIT 版本）。感谢该项目作者。
 
-## Support the author
+## 支持作者
 
-If this plugin has been useful to you, feel free to buy the author a coffee:
+如果这个插件帮到了你，欢迎请作者喝杯咖啡：
 
-<!-- Put your donation QR code / funding link here, e.g.: -->
-<!-- ![Support the author](assets/donate.png) -->
+<!-- 在这里放你的赞赏码图片，例如： -->
+<!-- ![支持作者](assets/donate.png) -->
 
-## Feedback
+## 问题反馈
 
-Found a problem? Please [open an issue](../../issues) on GitHub. Include:
+使用中遇到问题，欢迎到 [GitHub 仓库](../../issues) 提交 issue。反馈时请附上：
 
-- Your Obsidian version (Settings → About)
-- The dictionary you were using
-- The full error message, if a dialog showed one
+- Obsidian 版本（设置 → 关于）
+- 使用的词典名称
+- 完整的错误信息（如果有弹窗报错，请复制全文）
