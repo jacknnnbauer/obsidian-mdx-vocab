@@ -1,7 +1,13 @@
 import { ExportFieldConfig, VocabRecord } from "./types";
 import { escapeHtml } from "./exportShared";
 
-export function buildVocabHtmlList(records: VocabRecord[], fields: ExportFieldConfig[]): string {
+export type HtmlExportTheme = "warm" | "steel" | "navy-gold";
+
+export function buildVocabHtmlList(
+	records: VocabRecord[],
+	fields: ExportFieldConfig[],
+	theme: HtmlExportTheme = "warm"
+): string {
 	const enabledKeys = new Set(fields.filter((f) => f.enabled).map((f) => f.key));
 
 	// 不同词典的 CSS 常有同名的通用 class（.word / .table ...），全局注入理论上有小概率互相覆盖，
@@ -56,7 +62,7 @@ export function buildVocabHtmlList(records: VocabRecord[], fields: ExportFieldCo
 		${items}
 	`;
 
-	return wrapHtmlDoc("生词本", body, `${LIST_STYLE}\n${allDictCss}`);
+	return wrapHtmlDoc("生词本", body, `${THEME_STYLES[theme]}\n${allDictCss}`);
 }
 
 function wrapHtmlDoc(title: string, bodyHtml: string, styleContent: string): string {
@@ -75,27 +81,30 @@ ${bodyHtml}
 </html>`;
 }
 
-const BASE_STYLE = `
-	:root { color-scheme: light; }
-	* { box-sizing: border-box; }
-	body {
-		margin: 0;
-		padding: 32px 16px;
-		background: #f4f2ee;
-		color: #2b2b2b;
-		font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-		line-height: 1.6;
-	}
-	.mv-container { max-width: 860px; margin: 0 auto; background: #fff; padding: 32px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-	h1 { font-size: 22px; margin: 0 0 4px; }
-	.meta { color: #888; font-size: 13px; margin: 0 0 24px; }
-	@media print {
-		body { background: #fff; padding: 0; }
-		.mv-container { box-shadow: none; padding: 0; }
-	}
-`;
+function baseStyle(pageBg: string, fontStack: string): string {
+	return `
+		:root { color-scheme: light; }
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			padding: 32px 16px;
+			background: ${pageBg};
+			color: #2b2b2b;
+			font-family: ${fontStack};
+			line-height: 1.6;
+		}
+		.mv-container { max-width: 860px; margin: 0 auto; background: #fff; padding: 32px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+		h1 { font-size: 22px; margin: 0 0 4px; }
+		.meta { color: #888; font-size: 13px; margin: 0 0 24px; }
+		@media print {
+			body { background: #fff; padding: 0; }
+			.mv-container { box-shadow: none; padding: 0; }
+		}
+	`;
+}
 
-const LIST_STYLE = `${BASE_STYLE}
+// 暖色经典：原来就有的默认样式，米白底、暖棕色点缀。
+const WARM_STYLE = `${baseStyle("#f4f2ee", '"Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif')}
 	.entry { padding: 20px 0; border-bottom: 1px solid #e8e5df; page-break-inside: avoid; }
 	.entry:last-child { border-bottom: none; }
 	.entry h3 { font-size: 19px; margin: 0 0 8px; color: #1f4e3d; }
@@ -106,3 +115,37 @@ const LIST_STYLE = `${BASE_STYLE}
 	.dict-name { font-size: 12px; font-weight: 600; color: #a6813f; margin-bottom: 6px; }
 	.dict-html { font-size: 14px; }
 `;
+
+// 钢蓝技术风：参照 md2pdf「工程文件·钢蓝」配色——深蓝灰标题、钢蓝分割线、浅蓝灰卡片，偏理工科的干净感。
+const STEEL_STYLE = `${baseStyle("#eef1f4", '"Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif')}
+	h1 { color: #1f2d3d; }
+	.entry { padding: 20px 0; border-bottom: 1px solid #dde3ea; page-break-inside: avoid; }
+	.entry:last-child { border-bottom: none; }
+	.entry h3 { font-size: 19px; margin: 0 0 8px; color: #1f2d3d; border-bottom: 1.4px solid #2f4a68; padding-bottom: 6px; display: inline-block; }
+	.entry .sentence { margin: 0 0 6px; padding-left: 12px; border-left: 3px solid #2f4a68; color: #445463; font-style: italic; }
+	.entry .meta { margin: 0 0 12px; color: #7a8897; }
+	.definitions { display: flex; flex-direction: column; gap: 10px; }
+	.dict-block { background: #f3f6f9; border: 1px solid #c9d2dc; border-radius: 6px; padding: 10px 14px; }
+	.dict-name { font-size: 12px; font-weight: 700; color: #2f4a68; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .3px; }
+	.dict-html { font-size: 14px; }
+`;
+
+// 国际双语风：参照 md2pdf「国际双语风」配色——深藏青标题、金色分割线，偏正式/双语词典的质感。
+const NAVY_GOLD_STYLE = `${baseStyle("#f3f1e9", '"Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif')}
+	h1 { color: #14264a; font-family: Georgia, "SimHei", serif; }
+	.entry { padding: 20px 0; border-bottom: 1px solid #eae3cf; page-break-inside: avoid; }
+	.entry:last-child { border-bottom: none; }
+	.entry h3 { font-size: 19px; margin: 0 0 8px; color: #14264a; font-family: Georgia, "SimHei", serif; border-bottom: 1.5px solid #b8962e; padding-bottom: 6px; display: inline-block; }
+	.entry .sentence { margin: 0 0 6px; padding-left: 12px; border-left: 3px solid #b8962e; color: #444; font-style: italic; }
+	.entry .meta { margin: 0 0 12px; color: #8a8368; }
+	.definitions { display: flex; flex-direction: column; gap: 10px; }
+	.dict-block { background: #f8f5ec; border: 1px solid #ddd6c3; border-radius: 6px; padding: 10px 14px; }
+	.dict-name { font-size: 12px; font-weight: 700; color: #b8962e; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .3px; }
+	.dict-html { font-size: 14px; }
+`;
+
+const THEME_STYLES: Record<HtmlExportTheme, string> = {
+	warm: WARM_STYLE,
+	steel: STEEL_STYLE,
+	"navy-gold": NAVY_GOLD_STYLE,
+};

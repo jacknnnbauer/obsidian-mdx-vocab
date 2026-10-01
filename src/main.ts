@@ -420,7 +420,7 @@ export default class VocabPlugin extends Plugin {
 			const buf = await buildVocabDocx(records, this.settings.exportFields);
 			fs.writeFileSync(savePath, Buffer.from(buf));
 		} else {
-			const html = buildVocabHtmlList(records, this.settings.exportFields);
+			const html = buildVocabHtmlList(records, this.settings.exportFields, this.settings.htmlExportTheme);
 			fs.writeFileSync(savePath, html, "utf-8");
 		}
 		new Notice(`已导出 ${records.length} 个单词到 ${savePath}`);

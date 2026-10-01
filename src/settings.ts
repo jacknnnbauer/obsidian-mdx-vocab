@@ -218,6 +218,20 @@ export class VocabSettingTab extends PluginSettingTab {
 					})
 			);
 		new Setting(containerEl)
+			.setName("HTML 导出配色")
+			.setDesc("只影响 HTML 导出的配色和字体，Word 导出不受影响。")
+			.addDropdown((dd) =>
+				dd
+					.addOption("warm", "暖色经典（米白底，暖棕色点缀）")
+					.addOption("steel", "钢蓝技术风（浅蓝灰底，钢蓝色点缀）")
+					.addOption("navy-gold", "国际双语风（藏青标题，金色分割线）")
+					.setValue(this.plugin.settings.htmlExportTheme)
+					.onChange(async (value) => {
+						this.plugin.settings.htmlExportTheme = value as "warm" | "steel" | "navy-gold";
+						await this.plugin.saveSettings();
+					})
+			);
+		new Setting(containerEl)
 			.setName("默认导出文件夹")
 			.setDesc("点「导出」时会弹出保存对话框，默认定位到 vault 内的这个文件夹，你也可以现场改存到别的地方")
 			.addText((text) =>

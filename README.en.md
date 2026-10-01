@@ -23,6 +23,16 @@ If you're used to the "tap a word, look it up, export a vocab list when you fini
 
 ---
 
+## What the export looks like
+
+The HTML export lays out one word per section, with definitions kept in the dictionary's original formatting (colors, bold text, phonetics — all preserved). Here's the same entry (`oppose`) in the three built-in color themes, switchable from "HTML export theme" in settings:
+
+| Warm classic (default) | Steel blue | Navy & gold |
+| --- | --- | --- |
+| ![Warm classic](screenshots/theme-warm.jpg) | ![Steel blue](screenshots/theme-steel.jpg) | ![Navy & gold](screenshots/theme-navy-gold.jpg) |
+
+---
+
 ## Installation
 
 ### From Obsidian's community plugin browser
@@ -82,6 +92,11 @@ Turn on "Sync lookups to a note" in settings, and pick a folder (the "Browse…"
 ---
 
 ## Changelog
+
+### 0.1.7
+
+- Added two more HTML export color themes (pick one under "HTML export theme" in settings): Steel blue and Navy & gold, inspired by the color schemes from the author's other open-source project, [md2pdf](https://github.com/jacknnnbauer/md2pdf). The original default style is now called "Warm classic".
+- Added real export screenshots to the README.
 
 ### 0.1.6
 

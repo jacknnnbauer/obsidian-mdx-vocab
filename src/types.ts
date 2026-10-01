@@ -43,6 +43,7 @@ export interface ExportFieldConfig {
 
 export type LookupTrigger = "dblclick" | "click" | "drag";
 export type ExportFormat = "docx" | "html-list";
+export type HtmlExportTheme = "warm" | "steel" | "navy-gold";
 
 export interface NoteSyncSettings {
 	enabled: boolean;
@@ -55,6 +56,7 @@ export interface VocabPluginSettings {
 	authorFrontmatterKey: string;
 	exportFolder: string; // 导出文件放在 vault 内哪个文件夹
 	exportFormat: ExportFormat;
+	htmlExportTheme: HtmlExportTheme;
 	exportFields: ExportFieldConfig[];
 	fuzzyEditDistance: number;
 	lookupTrigger: LookupTrigger;
@@ -78,6 +80,7 @@ export const DEFAULT_SETTINGS: VocabPluginSettings = {
 	authorFrontmatterKey: "author",
 	exportFolder: "生词本导出",
 	exportFormat: "docx",
+	htmlExportTheme: "warm",
 	exportFields: DEFAULT_EXPORT_FIELDS,
 	fuzzyEditDistance: 2,
 	lookupTrigger: "dblclick",
