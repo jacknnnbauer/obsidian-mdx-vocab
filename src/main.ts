@@ -1,12 +1,11 @@
 import { FileSystemAdapter, MarkdownView, Notice, Plugin, TFile, normalizePath } from "obsidian";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import { DictionaryManager } from "./dictionaryManager";
-import { buildVocabDocx } from "./exportDocx";
 import { buildVocabHtmlList } from "./exportHtml";
 import { getElectronRemote } from "./electronRemote";
 import { escapeHtml, nl2br } from "./exportShared";
-import { htmlToPlainText } from "./htmlToText";
 import { DictResultEntry, LookupPopup } from "./lookupPopup";
 import { extractContext } from "./sentenceExtractor";
 import { DEFAULT_SETTINGS, RecordDefinition, VocabPluginSettings, VocabRecord } from "./types";
@@ -326,23 +325,6 @@ export default class VocabPlugin extends Plugin {
 		return { ok: true, message: `已更新为「${trimmed}」的释义` };
 	}
 
-	/** 用已存的 html+css 重新生成每条记录的纯文本释义（Word 导出用的那个字段） */
-	async regenerateDefinitionText(): Promise<number> {
-		let changed = 0;
-		for (const r of this.records) {
-			for (const d of r.definitions) {
-				if (!d.html) continue;
-				const fresh = htmlToPlainText(d.html, d.css);
-				if (fresh !== d.text) {
-					d.text = fresh;
-					changed++;
-				}
-			}
-		}
-		if (changed > 0) await this.savePluginData();
-		return changed;
-	}
-
 	private async syncToNote(record: VocabRecord) {
 		if (!this.settings.noteSync.enabled) return;
 
@@ -406,7 +388,7 @@ export default class VocabPlugin extends Plugin {
 
 		const stamp = formatDate(new Date());
 		const format = this.settings.exportFormat;
-		const ext = format === "docx" ? "docx" : "html";
+		const ext = format === "pdf" ? "pdf" : "html";
 		const filename = `生词本-${stamp}.${ext}`;
 
 		const adapter = this.app.vault.adapter;
@@ -416,11 +398,17 @@ export default class VocabPlugin extends Plugin {
 		const savePath = this.chooseSaveDestination(defaultPath, ext);
 		if (!savePath) return; // 用户取消
 
-		if (format === "docx") {
-			const buf = await buildVocabDocx(records, this.settings.exportFields);
-			fs.writeFileSync(savePath, Buffer.from(buf));
+		const html = buildVocabHtmlList(records, this.settings.exportFields, this.settings.htmlExportTheme);
+
+		if (format === "pdf") {
+			try {
+				const pdfBuf = await this.htmlToPdfBuffer(html);
+				fs.writeFileSync(savePath, pdfBuf);
+			} catch (e) {
+				new Notice(`导出 PDF 失败：${e instanceof Error ? e.message : String(e)}`);
+				return;
+			}
 		} else {
-			const html = buildVocabHtmlList(records, this.settings.exportFields, this.settings.htmlExportTheme);
 			fs.writeFileSync(savePath, html, "utf-8");
 		}
 		new Notice(`已导出 ${records.length} 个单词到 ${savePath}`);
@@ -434,9 +422,34 @@ export default class VocabPlugin extends Plugin {
 		const result: string | undefined = electronRemote.dialog.showSaveDialogSync(electronRemote.getCurrentWindow?.(), {
 			title: "导出生词本",
 			defaultPath,
-			filters: [{ name: ext === "docx" ? "Word 文档" : "HTML 文件", extensions: [ext] }],
+			filters: [{ name: ext === "pdf" ? "PDF 文件" : "HTML 文件", extensions: [ext] }],
 		});
 		return result ?? null;
+	}
+
+	/**
+	 * 把 HTML 渲染成 PDF：开一个不显示的 Electron 窗口加载这段 HTML，再用它自带的
+	 * printToPDF 打印成文件——不用再依赖任何第三方库。
+	 */
+	private async htmlToPdfBuffer(html: string): Promise<Buffer> {
+		const electronRemote = getElectronRemote();
+		if (!electronRemote?.BrowserWindow) {
+			throw new Error("当前环境不支持生成 PDF（缺少 BrowserWindow），可以先导出 HTML 再用浏览器打印成 PDF");
+		}
+
+		const tempPath = path.join(os.tmpdir(), `mdx-vocab-export-${Date.now()}-${makeId()}.html`);
+		fs.writeFileSync(tempPath, html, "utf-8");
+
+		let win: InstanceType<typeof electronRemote.BrowserWindow> | null = null;
+		try {
+			win = new electronRemote.BrowserWindow({ show: false });
+			await win.loadFile(tempPath);
+			const pdfBuffer: Buffer = await win.webContents.printToPDF({ printBackground: true });
+			return pdfBuffer;
+		} finally {
+			win?.destroy();
+			fs.unlinkSync(tempPath);
+		}
 	}
 
 	private async loadPluginData() {
@@ -452,8 +465,9 @@ export default class VocabPlugin extends Plugin {
 			migrated = true;
 		}
 
-		// 迁移：早期版本有过 "html-table" 这个导出格式，现在已经去掉了
-		if (rawSettings.exportFormat === "html-table") {
+		// 迁移：早期版本有过 "html-table" 和 "docx" 这两个导出格式，现在都去掉了
+		// （docx 换成了用 Electron 原生能力直接导出 PDF，不用再依赖那个库）
+		if (rawSettings.exportFormat === "html-table" || rawSettings.exportFormat === "docx") {
 			rawSettings.exportFormat = "html-list";
 			migrated = true;
 		}

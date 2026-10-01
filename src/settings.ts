@@ -4,7 +4,7 @@ import { DictionaryEntry } from "./types";
 import { getElectronRemote } from "./electronRemote";
 
 export class VocabSettingTab extends PluginSettingTab {
-	private recordsCountSetting?: Setting;
+	private recordsCountEl?: HTMLElement;
 	private recordsWrapEl?: HTMLElement;
 	private selectedRecordIds = new Set<string>();
 
@@ -209,17 +209,17 @@ export class VocabSettingTab extends PluginSettingTab {
 			.setName("导出格式")
 			.addDropdown((dd) =>
 				dd
-					.addOption("docx", "Word（逐词排版，含完整释义）")
 					.addOption("html-list", "HTML（逐词排版，含完整释义）")
+					.addOption("pdf", "PDF（逐词排版，含完整释义）")
 					.setValue(this.plugin.settings.exportFormat)
 					.onChange(async (value) => {
-						this.plugin.settings.exportFormat = value as "docx" | "html-list";
+						this.plugin.settings.exportFormat = value as "html-list" | "pdf";
 						await this.plugin.saveSettings();
 					})
 			);
 		new Setting(containerEl)
 			.setName("HTML 导出配色")
-			.setDesc("只影响 HTML 导出的配色和字体，Word 导出不受影响。")
+			.setDesc("影响 HTML 和 PDF 导出的配色和字体（PDF 由同一份 HTML 生成）。")
 			.addDropdown((dd) =>
 				dd
 					.addOption("warm", "暖色经典（米白底，暖棕色点缀）")
@@ -240,11 +240,6 @@ export class VocabSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				})
 			);
-		containerEl.createEl("p", {
-			text: "想要 PDF？导出 HTML 后用浏览器打开，「打印」→「另存为 PDF」即可，版式已经适配好打印效果，跟直接导出 PDF 是一样的。",
-			cls: "setting-item-description",
-		});
-
 		new Setting(containerEl)
 			.setName("模糊匹配的编辑距离")
 			.setDesc("精确匹配和词形还原都查不到时，用于推测相近词条的编辑距离阈值；越大候选越多但越不准")
@@ -263,40 +258,19 @@ export class VocabSettingTab extends PluginSettingTab {
 		this.renderFieldList(list);
 
 		new Setting(containerEl).setName("生词本").setHeading();
-		this.recordsCountSetting = new Setting(containerEl)
-			.setName(`当前已记录 ${this.plugin.records.length} 个单词`)
-			.setDesc("下面表格里勾选几条就只导出勾选的；一条都没勾就导出全部。")
-			.addButton((btn) =>
-				btn
-					.setButtonText("导出")
-					.setCta()
-					.onClick(() => this.plugin.exportVocab(this.selectedRecordIds.size > 0 ? [...this.selectedRecordIds] : undefined))
-			)
-			.addButton((btn) =>
-				btn
-					.setButtonText("清空生词本")
-					.setWarning()
-					.onClick(async () => {
-						if (confirm("确定要清空全部生词记录吗？此操作不可撤销。")) {
-							await this.plugin.clearRecords();
-							this.recordsCountSetting?.setName(`当前已记录 ${this.plugin.records.length} 个单词`);
-							if (this.recordsWrapEl) this.renderRecordsTable(this.recordsWrapEl);
-						}
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("修复旧记录的释义排版")
-			.setDesc("早期版本导出的纯文本释义换行很乱；这个按钮会用已经存好的词条 HTML 重新生成一遍，不用重新查词。")
-			.addButton((btn) =>
-				btn.setButtonText("修复").onClick(async () => {
-					const n = await this.plugin.regenerateDefinitionText();
-					new Notice(n > 0 ? `已修复 ${n} 条释义` : "没有需要修复的记录");
-				})
-			);
+		this.recordsCountEl = containerEl.createEl("p", {
+			text: `当前已记录 ${this.plugin.records.length} 个单词。下面表格里勾选几条就只导出勾选的；一条都没勾就导出全部。`,
+			cls: "setting-item-description",
+		});
 
 		this.recordsWrapEl = containerEl.createDiv();
 		this.renderRecordsTable(this.recordsWrapEl);
+	}
+
+	private refreshRecordsCount(): void {
+		this.recordsCountEl?.setText(
+			`当前已记录 ${this.plugin.records.length} 个单词。下面表格里勾选几条就只导出勾选的；一条都没勾就导出全部。`
+		);
 	}
 
 	private renderRecordsTable(container: HTMLElement): void {
@@ -318,25 +292,25 @@ export class VocabSettingTab extends PluginSettingTab {
 		Object.assign(container.style, { minWidth: "0" });
 
 		const toolbar = container.createDiv();
-		Object.assign(toolbar.style, { display: "flex", gap: "8px", marginBottom: "6px" });
-		const toolbarBtn = (text: string, onClick: () => void) => {
-			const btn = toolbar.createEl("button", { text });
+		Object.assign(toolbar.style, { display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" });
+		const toolbarBtn = (parent: HTMLElement, text: string, onClick: () => void) => {
+			const btn = parent.createEl("button", { text });
 			Object.assign(btn.style, { fontSize: "12px" });
 			btn.addEventListener("click", onClick);
 			return btn;
 		};
-		toolbarBtn("全选", () => {
+		toolbarBtn(toolbar, "全选", () => {
 			for (const r of shown) this.selectedRecordIds.add(r.id);
 			this.renderRecordsTable(container);
 		});
-		toolbarBtn("选中今天", () => {
+		toolbarBtn(toolbar, "选中今天", () => {
 			const todayKey = new Date().toDateString();
 			for (const r of this.plugin.records) {
 				if (new Date(r.createdAt).toDateString() === todayKey) this.selectedRecordIds.add(r.id);
 			}
 			this.renderRecordsTable(container);
 		});
-		toolbarBtn("清空选择", () => {
+		toolbarBtn(toolbar, "清空选择", () => {
 			this.selectedRecordIds.clear();
 			this.renderRecordsTable(container);
 		});
@@ -347,6 +321,21 @@ export class VocabSettingTab extends PluginSettingTab {
 			});
 			Object.assign(countLabel.style, { alignSelf: "center" });
 		}
+
+		const spacer = toolbar.createDiv();
+		Object.assign(spacer.style, { flex: "1" });
+
+		toolbarBtn(toolbar, "导出", () =>
+			this.plugin.exportVocab(this.selectedRecordIds.size > 0 ? [...this.selectedRecordIds] : undefined)
+		);
+		toolbarBtn(toolbar, "清空生词本", async () => {
+			if (confirm("确定要清空全部生词记录吗？此操作不可撤销。")) {
+				await this.plugin.clearRecords();
+				this.selectedRecordIds.clear();
+				this.refreshRecordsCount();
+				this.renderRecordsTable(container);
+			}
+		});
 
 		// 横向滚动条的样式在 styles.css 里（.mv-records-scroll），Obsidian 会自动加载该文件，
 		// 不需要在这里动态创建 <style> 元素。
@@ -395,7 +384,10 @@ export class VocabSettingTab extends PluginSettingTab {
 		Object.assign(table.style, {
 			width: "100%",
 			tableLayout: "fixed",
-			borderCollapse: "collapse",
+			// separate 而不是 collapse：collapse 模式下表头的 position:sticky 在部分浏览器里会
+			// 跟下面滚动过去的行互相穿透/重叠（这里每个格子本来就各自画了 border，不需要合并边框）。
+			borderCollapse: "separate",
+			borderSpacing: "0",
 			fontSize: "12px",
 		});
 
@@ -526,7 +518,7 @@ export class VocabSettingTab extends PluginSettingTab {
 			delBtn.setAttr("title", "删除这条记录");
 			delBtn.addEventListener("click", async () => {
 				await this.plugin.deleteRecord(r.id);
-				this.recordsCountSetting?.setName(`当前已记录 ${this.plugin.records.length} 个单词`);
+				this.refreshRecordsCount();
 				this.renderRecordsTable(container);
 			});
 		});

@@ -8,7 +8,7 @@ export interface DictionaryEntry {
 export interface RecordDefinition {
 	dictName: string;
 	headword: string;
-	text: string; // 纯文本，导出 Word 用
+	text: string; // 纯文本（历史字段，早期 Word 导出用过；HTML/PDF 导出直接用 html）
 	html: string; // 带排版的词条 HTML 片段，导出 HTML 列表用
 	css: string; // 该词典自带样式
 }
@@ -42,7 +42,7 @@ export interface ExportFieldConfig {
 }
 
 export type LookupTrigger = "dblclick" | "click" | "drag";
-export type ExportFormat = "docx" | "html-list";
+export type ExportFormat = "html-list" | "pdf";
 export type HtmlExportTheme = "warm" | "steel" | "navy-gold";
 
 export interface NoteSyncSettings {
@@ -79,7 +79,7 @@ export const DEFAULT_SETTINGS: VocabPluginSettings = {
 	titleFrontmatterKey: "title",
 	authorFrontmatterKey: "author",
 	exportFolder: "生词本导出",
-	exportFormat: "docx",
+	exportFormat: "html-list",
 	htmlExportTheme: "warm",
 	exportFields: DEFAULT_EXPORT_FIELDS,
 	fuzzyEditDistance: 2,

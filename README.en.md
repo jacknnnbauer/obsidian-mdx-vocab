@@ -2,7 +2,7 @@
 
 # MDX Vocab Lookup
 
-Look up words in your own local MDX dictionaries right inside Obsidian. Double-click, single-click, or drag-select a word while reading a note, and a popup shows the dictionary's definition with its original formatting preserved. Every lookup is automatically saved with the full sentence, book title/author (from frontmatter), and timestamp, so you can export a nicely formatted Word or HTML vocabulary list when you're done reading — or export just today's words for daily review. Works fully offline; no network requests are made.
+Look up words in your own local MDX dictionaries right inside Obsidian. Double-click, single-click, or drag-select a word while reading a note, and a popup shows the dictionary's definition with its original formatting preserved. Every lookup is automatically saved with the full sentence, book title/author (from frontmatter), and timestamp, so you can export a nicely formatted HTML or PDF vocabulary list when you're done reading — or export just today's words for daily review. Works fully offline; no network requests are made.
 
 If you're used to the "tap a word, look it up, export a vocab list when you finish the book" workflow from e-readers like Kindle, this plugin brings that same experience into Obsidian, since your books/articles are already Markdown notes there.
 
@@ -17,7 +17,7 @@ If you're used to the "tap a word, look it up, export a vocab list when you fini
 - **Automatic context recording**: the **full sentence** the word appears in (correctly extracted whether your note uses hard line breaks or one long paragraph per line), the book title and author (read from frontmatter, with configurable field names), and the timestamp — all captured in a single click.
 - **Fix a lookup after the fact**: looked up the wrong word form (e.g. got `opposed` when you meant to learn `oppose`)? Double-click the word in the vocab table to edit it in place; it automatically re-looks up the new word and replaces the definition.
 - **Pick what to export**: the built-in vocab table supports checkboxes with "Select all", "Select today", and "Clear selection" — export just the checked rows, or export everything if nothing is checked. Handy for a "export just the 20 words I looked up today" review habit.
-- **Export to Word or HTML**: both formats lay out one word per section (heading + sentence + book/author/date + full definition), preserving the dictionary's original formatting. Want a PDF? Export HTML, then use your browser's Print → Save as PDF — same result.
+- **Export to HTML or PDF**: both formats lay out one word per section (heading + sentence + book/author/date + full definition), preserving the dictionary's original formatting. PDFs are generated natively via Obsidian's built-in Electron, no manual print-to-PDF step needed.
 - **Optional note syncing**: turn this on to append each lookup (word, sentence, timestamp — no definitions, since those are long and don't read well in Markdown) to a per-book note, so you can browse everything you looked up for a given book directly in your vault.
 - **Fully offline**: no network access, no uploading of your notes or dictionary data.
 
@@ -70,9 +70,8 @@ If a dictionary's styling/audio assets are packed into a same-named `.mdd` file,
 
 1. At the bottom of the plugin settings, the "Vocab list" section shows a table: number, word, sentence, book, time.
 2. **Fix a word form**: double-click the "word" cell to edit it in place; press Enter or click away to re-look it up and replace the definition automatically.
-3. **Select what to export**: checkboxes on the left, plus "Select all" / "Select today" / "Clear selection" above the table — checked rows are what gets exported; if nothing is checked, everything is exported.
-4. Choose "Word" or "HTML" as the export format, then click "Export" — a native save dialog opens, defaulting to the folder set in settings (you can save anywhere else too).
-5. Want a PDF? Export HTML, open it in your browser, and use Print → Save as PDF.
+3. **Select what to export**: checkboxes on the left, plus "Select all" / "Select today" / "Clear selection" in the toolbar above the table — checked rows are what gets exported; if nothing is checked, everything is exported. The "Export" and "Clear vocab list" buttons sit at the right end of that same toolbar row.
+4. Choose "HTML" or "PDF" as the export format, then click "Export" — a native save dialog opens, defaulting to the folder set in settings (you can save anywhere else too).
 
 ### 4. Sync to a note (optional)
 
@@ -92,6 +91,13 @@ Turn on "Sync lookups to a note" in settings, and pick a folder (the "Browse…"
 ---
 
 ## Changelog
+
+### 0.1.8
+
+- Export format is now HTML / PDF only: PDFs are generated natively via Obsidian's built-in Electron (`printToPDF`), no more manual "print to PDF" step. Removed Word export and the `docx` dependency entirely, shrinking `main.js` from ~434KB to ~76KB.
+- Moved the "Export" and "Clear vocab list" buttons into the same toolbar row as "Select all" / "Select today" / "Clear selection", right-aligned.
+- Fixed a visual bug where the row checkboxes bled through the sticky table header when scrolling up (table now uses `border-collapse: separate`).
+- Removed the now-unused "repair old records' definition formatting" setting.
 
 ### 0.1.7
 
