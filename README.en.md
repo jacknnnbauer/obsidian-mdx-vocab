@@ -83,6 +83,10 @@ Turn on "Sync lookups to a note" in settings, and pick a folder (the "Browse…"
 
 ## Changelog
 
+### 0.1.6
+
+- When exporting (Word / HTML), each record's definitions are now filtered and reordered according to your **current** dictionary settings: a disabled dictionary's definition is left out of the export, and reordering your dictionaries reorders the exported definitions too. The record's own stored snapshot is untouched — this only affects that export. To refresh the record itself with the current dictionaries' definitions, double-click the word to edit it in place and re-look it up.
+
 ### 0.1.5
 
 - Found the actual source of the "dynamic script element creations" finding: it wasn't anything in this plugin's own code, but a dead-code fallback branch (an old IE-era `createElement("script")` trick for scheduling) bundled inside the `docx` dependency's compiled output. It's unreachable in Electron (a `MutationObserver`/`MessageChannel` check always wins first), so the fix is a build-time patch (via `patch-package`) that removes it from `docx`'s bundled files, applied automatically on install.

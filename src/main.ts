@@ -152,6 +152,25 @@ export default class VocabPlugin extends Plugin {
 		return this.settings.dictionaries.filter((d) => d.enabled && this.dict.isLoaded(d.id));
 	}
 
+	/**
+	 * 导出前按"当前"词典设置过滤/排序每条记录里已经存好的释义——不重新查词，只是：
+	 * 已经停用的词典不导出它的那段释义；词典顺序调了，释义段落也跟着换顺序。
+	 * 记录本身存的历史快照不受影响，只影响这一次导出的结果。
+	 */
+	private applyCurrentDictionaryFilterAndOrder(records: VocabRecord[]): VocabRecord[] {
+		const order = new Map<string, number>();
+		this.settings.dictionaries.forEach((d, idx) => {
+			if (d.enabled) order.set(d.name, idx);
+		});
+
+		return records.map((r) => {
+			const definitions = r.definitions
+				.filter((d) => order.has(d.dictName))
+				.sort((a, b) => order.get(a.dictName)! - order.get(b.dictName)!);
+			return { ...r, definitions };
+		});
+	}
+
 	private runLookup(range: Range, rawWord: string) {
 		if (this.enabledDictionaries().length === 0) {
 			new Notice("还没有已加载的词典，请到插件设置里添加/启用至少一本 .mdx 词典");
@@ -371,13 +390,15 @@ export default class VocabPlugin extends Plugin {
 	}
 
 	async exportVocab(recordIds?: string[]) {
-		const records =
+		const selected =
 			recordIds && recordIds.length > 0 ? this.records.filter((r) => recordIds.includes(r.id)) : this.records;
 
-		if (records.length === 0) {
+		if (selected.length === 0) {
 			new Notice("生词本还是空的");
 			return;
 		}
+
+		const records = this.applyCurrentDictionaryFilterAndOrder(selected);
 		const folder = normalizePath(this.settings.exportFolder || "生词本导出");
 		if (!(await this.app.vault.adapter.exists(folder))) {
 			await this.app.vault.createFolder(folder);
